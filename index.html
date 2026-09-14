@@ -244,12 +244,12 @@
         </div>
     </section>
 
-    <!-- KOMPLETNA SEKCIJA JELOVNIKA (LA CARTE) -->
+    <!-- KOMPLETNA SEKCIJA JELOVNIKA -->
     <section id="meni" class="py-24 max-w-7xl mx-auto px-6 md:px-12">
         <div class="text-center mb-14 fade-in-section">
             <span class="text-xs uppercase tracking-luxury text-sphere-gold font-semibold">Gastronomski Izbor</span>
             <h2 class="font-serif text-4xl md:text-5xl mt-2 tracking-wide uppercase font-light text-sphere-dark">
-                LA CARTE / JELOVNIK
+                JELOVNIK
             </h2>
             <div class="w-16 h-px bg-sphere-gold mx-auto mt-4"></div>
             <p class="text-sphere-muted text-xs uppercase tracking-widest mt-4">Izaberite kategoriju za pregled jela</p>
@@ -848,8 +848,19 @@
 
     <!-- KONTAKT & KOMENTARI -->
     <section id="kontakt" class="py-24 max-w-7xl mx-auto px-6 md:px-12 border-t border-sphere-border">
+        <!-- Banner obaveštenja ako je komentar upravo odobren preko mejla -->
+        <div id="url-approved-alert" class="hidden mb-8 p-4 bg-green-50 border border-green-300 text-green-900 rounded-sm flex items-start justify-between gap-4 shadow-xs">
+            <div class="flex items-start space-x-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-green-700 shrink-0 mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-sm">Komentar je uspešno odobren i objavljen na sajtu!</h4>
+                    <p id="url-approved-text" class="text-xs text-green-800 mt-0.5"></p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('url-approved-alert').classList.add('hidden')" class="text-green-800 hover:text-green-950 text-xs font-semibold uppercase tracking-wider">Zatvori</button>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            
             <div class="lg:col-span-5 fade-in-section">
                 <span class="text-xs uppercase tracking-luxury text-sphere-gold font-semibold">Informacije</span>
                 <h2 class="font-serif text-4xl font-light mt-2 mb-6 uppercase text-sphere-dark">
@@ -886,12 +897,23 @@
 
                 <div class="mt-8 pt-6 border-t border-sphere-border">
                     <div class="p-4 bg-sphere-surface border border-sphere-border rounded-sm">
-                        <div class="flex items-center space-x-2 text-sphere-dark font-medium text-xs uppercase tracking-wider mb-2">
-                            <i data-lucide="message-square-quote" class="w-4 h-4 text-sphere-gold"></i>
-                            <span>Utisak Posetilaca</span>
+                        <div class="flex items-center justify-between space-x-2 text-sphere-dark font-medium text-xs uppercase tracking-wider mb-3 pb-2 border-b border-sphere-border">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="message-square-quote" class="w-4 h-4 text-sphere-gold"></i>
+                                <span>Utisci Naših Gostiju</span>
+                            </div>
+                            <span id="reviews-count-badge" class="text-[10px] text-stone-500"></span>
                         </div>
-                        <p class="text-xs text-sphere-muted italic">"Najbolja Slovan pica sa duplim testom u celoj Bačkoj Palanci! Uvek toplo i sveže pripremljeno."</p>
-                        <span class="text-[10px] text-stone-400 block mt-1.5">— Jovan M., redovan gost</span>
+                        <div id="reviews-list-container" class="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                            <!-- Učitava se dinamički iz skripte -->
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-sphere-border flex items-center justify-between text-[11px] text-sphere-muted">
+                            <button type="button" onclick="openAdminModal()" class="hover:text-sphere-gold flex items-center space-x-1.5 transition-colors font-medium">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-sphere-gold"></i>
+                                <span>Moderacija komentara (Admin)</span>
+                            </button>
+                            <span class="text-[10px] text-stone-400">PIN: 1234</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -902,23 +924,59 @@
                 <h3 class="font-serif text-2xl font-light uppercase tracking-wider mb-2 text-sphere-dark">
                     Ostavite Komentar
                 </h3>
-                <p class="text-xs text-sphere-muted uppercase tracking-widest mb-6">Podelite vaše utiske, ocenu ili sugestiju sa nama</p>
+                <p class="text-xs text-sphere-muted uppercase tracking-widest mb-6">
+                    Komentari se šalju na odobrenje (info@slovankacaffe.com) pre objave na sajtu
+                </p>
 
-                <form onsubmit="handleReservation(event)" class="space-y-5">
+                <!-- Box potvrde nakon slanja -->
+                <div id="comment-submitted-box" class="hidden bg-white p-6 sm:p-8 border border-sphere-gold rounded-sm text-center space-y-4">
+                    <i data-lucide="check-circle-2" class="w-12 h-12 text-sphere-gold mx-auto"></i>
+                    <div>
+                        <h4 class="font-serif text-2xl text-sphere-dark mb-1">Hvala vam na komentaru!</h4>
+                        <p id="submitted-author-info" class="text-xs text-sphere-muted"></p>
+                    </div>
+                    <div class="p-4 bg-sphere-base border border-sphere-border rounded-sm text-left space-y-2">
+                        <div class="flex items-center space-x-2 text-xs font-semibold text-sphere-dark">
+                            <i data-lucide="mail" class="w-4 h-4 text-sphere-gold"></i>
+                            <span>Obaveštenje za odobrenje poslato na e-mail:</span>
+                        </div>
+                        <div class="text-xs bg-white p-2.5 rounded border border-sphere-border font-mono text-sphere-gold font-semibold">
+                            info@slovankacaffe.com
+                        </div>
+                        <p class="text-[11px] text-sphere-muted leading-relaxed">
+                            Radi očuvanja kvaliteta, svaki komentar pregleda naš administrator. Čim vlasnik klikne na link za odobrenje u mejlu (ili odobri u administratorskom panelu), vaš komentar će se automatski pojaviti na sajtu!
+                        </p>
+                    </div>
+                    <div id="submitted-preview-text" class="p-3.5 bg-stone-50 border border-sphere-border text-xs text-stone-600 rounded-sm text-left italic"></div>
+                    <div class="pt-2">
+                        <a id="submitted-mailto-link" href="#" class="inline-flex items-center space-x-1.5 text-xs text-stone-500 hover:text-sphere-gold transition-colors underline decoration-dotted" target="_blank">
+                            <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                            <span>Otvorite e-mail klijent za direktno slanje</span>
+                        </a>
+                    </div>
+                    <div class="pt-2">
+                        <button type="button" onclick="resetCommentForm()" class="px-6 py-2.5 bg-sphere-dark text-white text-xs uppercase tracking-widest hover:bg-sphere-olive transition-colors rounded-sm font-semibold">
+                            Napišite novi komentar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forma -->
+                <form id="comment-main-form" onsubmit="handleCommentSubmit(event)" class="space-y-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-[11px] uppercase tracking-widest text-sphere-muted mb-1.5 font-medium">Ime i Prezime *</label>
-                            <input type="text" name="Ime i prezime" required placeholder="Vaše ime" class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm">
+                            <input type="text" id="comment-name" required placeholder="Vaše ime" class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm">
                         </div>
                         <div>
                             <label class="block text-[11px] uppercase tracking-widest text-sphere-muted mb-1.5 font-medium">Telefon ili E-mail (opciono)</label>
-                            <input type="text" name="Kontakt" placeholder="06x xxx xxxx ili email" class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm">
+                            <input type="text" id="comment-contact" placeholder="06x xxx xxxx ili email" class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-[11px] uppercase tracking-widest text-sphere-muted mb-1.5 font-medium">Vaša Ocena</label>
-                        <select name="Ocena" class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm">
+                        <select id="comment-rating" class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm">
                             <option value="5">★★★★★ - Izvrsno (5/5)</option>
                             <option value="4">★★★★☆ - Vrlo dobro (4/5)</option>
                             <option value="3">★★★☆☆ - Dobro (3/5)</option>
@@ -929,16 +987,18 @@
 
                     <div>
                         <label class="block text-[11px] uppercase tracking-widest text-sphere-muted mb-1.5 font-medium">Vaš Komentar ili Utisak *</label>
-                        <textarea name="Komentar" rows="4" required placeholder="Podelite vaše iskustvo o hrani, ambijentu ili osoblju..." class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm"></textarea>
+                        <textarea id="comment-text" rows="4" required placeholder="Podelite vaše iskustvo o hrani, ambijentu ili osoblju..." class="w-full px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm"></textarea>
                     </div>
 
-                    <button type="submit" class="w-full py-4 bg-sphere-dark text-white text-xs uppercase tracking-widest font-semibold hover:bg-sphere-olive transition-colors">
-                        Pošaljite Komentar
-                    </button>
-                    
-                    <div id="reservation-alert" class="hidden text-center text-xs tracking-wider text-green-900 font-medium py-3 bg-green-50 border border-green-200">
-                        Hvala! Vaš komentar je uspešno zabeležen.
+                    <div class="p-3 bg-sphere-base border border-sphere-border rounded-sm text-[11px] text-sphere-muted flex items-center space-x-2">
+                        <i data-lucide="mail" class="w-4 h-4 text-sphere-gold shrink-0"></i>
+                        <span>Komentar se šalje na <strong class="text-sphere-dark">info@slovankacaffe.com</strong> gde se odobrava pre objave.</span>
                     </div>
+
+                    <button id="comment-submit-btn" type="submit" class="w-full py-4 bg-sphere-dark text-white text-xs uppercase tracking-widest font-semibold hover:bg-sphere-olive transition-colors flex items-center justify-center space-x-2">
+                        <i data-lucide="send" class="w-4 h-4 text-sphere-gold"></i>
+                        <span>Pošaljite Komentar</span>
+                    </button>
                 </form>
             </div>
 
@@ -964,66 +1024,541 @@
                 <a href="#ambijent" class="hover:text-sphere-gold transition-colors">Ambijent</a>
                 <a href="#kokteli" class="hover:text-sphere-gold transition-colors">Kokteli</a>
                 <a href="#kontakt" class="hover:text-sphere-gold transition-colors">Kontakt & Komentari</a>
+                <button type="button" onclick="openAdminModal()" class="hover:text-sphere-gold transition-colors inline-flex items-center space-x-1.5 text-stone-500" title="Administracija i moderacija komentara">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-sphere-gold"></i>
+                    <span>Moderacija</span>
+                </button>
                 <a href="./slovanka-caffe-pizzeria.zip" download="slovanka-caffe-pizzeria.zip" class="inline-flex items-center space-x-1.5 text-sphere-dark font-semibold underline underline-offset-4 decoration-sphere-gold hover:text-sphere-gold transition-colors" title="Preuzmite kompletan sajt u ZIP folderu">
                     <i data-lucide="download" class="w-3.5 h-3.5 text-sphere-gold"></i>
                     <span>Preuzmi sajt</span>
                 </a>
             </div>
             <p class="text-[11px] text-stone-400 uppercase tracking-wider">
-                &copy; <span id="year"></span> Slovanka Caffe Pizzeria. Sva prava zadržana.
+                &copy; <span id="year"></span> Slovanka Caffe Pizzeria. Selenča. Sva prava zadržana.
             </p>
         </div>
     </footer>
 
-    <!-- POPUP MODAL ZA KOMENTAR -->
+    <!-- POPUP MODAL ZA REZERVACIJU / BRZI KONTAKT -->
     <div id="reservation-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
         <div class="bg-sphere-base max-w-md w-full p-8 relative border border-sphere-border shadow-2xl">
             <button onclick="toggleModal(false)" class="absolute top-4 right-4 text-sphere-muted hover:text-sphere-dark">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <span class="text-[10px] uppercase tracking-luxury text-sphere-gold font-semibold">Vaš Utisak</span>
-            <h3 class="font-serif text-2xl uppercase mt-1 mb-5 text-sphere-dark">Ostavite Komentar</h3>
+            <span class="text-[10px] uppercase tracking-luxury text-sphere-gold font-semibold">Rezervacija Stola</span>
+            <h3 class="font-serif text-2xl uppercase mt-1 mb-5 text-sphere-dark">Rezervišite Vaš Sto</h3>
             
             <form id="modal-reservation-form" onsubmit="handleModalSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Ime i Prezime *</label>
-                    <input type="text" name="Ime i prezime" required class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
+                    <input type="text" id="modal-res-name" required class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Telefon ili E-mail (opciono)</label>
-                    <input type="text" name="Kontakt" class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
+                    <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Broj Telefona *</label>
+                    <input type="tel" id="modal-res-phone" required placeholder="06x xxx xxxx" class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Datum</label>
+                        <input type="date" id="res-date" class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Broj Osoba</label>
+                        <select id="modal-res-guests" class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
+                            <option value="2">2 osobe</option>
+                            <option value="4" selected>4 osobe</option>
+                            <option value="6">6 osoba</option>
+                            <option value="8">8+ osoba</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Ocena</label>
-                    <select name="Ocena" class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none">
-                        <option value="5">★★★★★ - Izvrsno (5/5)</option>
-                        <option value="4">★★★★☆ - Vrlo dobro (4/5)</option>
-                        <option value="3">★★★☆☆ - Dobro (3/5)</option>
-                        <option value="2">★★☆☆☆ - Dovoljno (2/5)</option>
-                        <option value="1">★☆☆☆☆ - Potrebno poboljšanje (1/5)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Vaš Komentar *</label>
-                    <textarea name="Komentar" required rows="3" placeholder="Vaš utisak..." class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none"></textarea>
+                    <label class="block text-[10px] uppercase tracking-widest text-sphere-muted mb-1">Napomena (opciono)</label>
+                    <textarea id="modal-res-notes" rows="2" placeholder="Npr. sto na letnjoj terasi..." class="w-full px-3 py-2 text-sm bg-white border border-sphere-border focus:outline-none"></textarea>
                 </div>
                 <button type="submit" class="w-full py-3 mt-2 bg-sphere-dark text-white text-xs uppercase tracking-widest hover:bg-sphere-olive transition-colors">
-                    Pošaljite Komentar
+                    Potvrdite Rezervaciju
                 </button>
                 <div id="modal-reservation-alert" class="hidden text-center text-xs tracking-wider text-green-900 font-medium py-3 bg-green-50 border border-green-200">
-                    Hvala! Vaš komentar je uspešno poslat.
+                    Hvala! Vaša rezervacija je uspešno primljena.
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- MODAL ZA MODERACIJU KOMENTARA (ADMIN) -->
+    <div id="admin-comments-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+        <div class="bg-sphere-base border border-sphere-gold w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="bg-[#1e1c18] text-[#fbf9f5] p-5 flex items-center justify-between border-b border-[#3a362d]">
+                <div class="flex items-center space-x-2.5">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-sphere-gold"></i>
+                    <div>
+                        <h3 class="font-serif text-lg tracking-wider uppercase">Moderacija Komentara</h3>
+                        <p class="text-[10px] text-stone-400">Slovanka Caffe Pizzeria • Selenča • info@slovankacaffe.com</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="p-1.5 text-stone-400 hover:text-white hover:bg-white/10 rounded-sm">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- PIN Login -->
+            <div id="admin-pin-view" class="p-8 sm:p-10 text-center">
+                <div class="w-12 h-12 rounded-full bg-sphere-surface border border-sphere-border text-sphere-gold flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="lock" class="w-6 h-6"></i>
+                </div>
+                <h4 class="font-serif text-xl text-sphere-dark mb-1">Prijava za Moderaciju</h4>
+                <p class="text-xs text-sphere-muted max-w-md mx-auto mb-6">
+                    Unesite administratorski PIN za pristup odobravanju i brisanju komentara gostiju na sajtu.
+                </p>
+                <form onsubmit="handleAdminLogin(event)" class="max-w-xs mx-auto space-y-4">
+                    <input type="password" id="admin-pin-input" placeholder="PIN kod (npr. 1234)" class="w-full text-center px-4 py-3 bg-white border border-sphere-border focus:border-sphere-dark focus:outline-none text-sm font-mono tracking-widest rounded-sm">
+                    <p id="admin-pin-err" class="hidden text-xs text-red-600">Pogrešan PIN kod. Pokušajte ponovo (podrazumevano: 1234).</p>
+                    <button type="submit" class="w-full py-3 bg-sphere-dark text-white text-xs uppercase tracking-widest font-semibold hover:bg-sphere-olive transition-colors rounded-sm">
+                        Prijavi se
+                    </button>
+                </form>
+            </div>
+
+            <!-- Moderation Panel -->
+            <div id="admin-panel-view" class="hidden flex-col flex-1 overflow-hidden">
+                <div class="flex border-b border-sphere-border bg-sphere-surface text-xs font-semibold uppercase tracking-wider">
+                    <button onclick="setAdminTab('pending')" id="tab-btn-pending" class="flex-1 py-3 px-4 border-b-2 border-sphere-gold bg-sphere-base text-sphere-dark flex items-center justify-center space-x-2">
+                        <i data-lucide="clock" class="w-4 h-4 text-sphere-gold"></i>
+                        <span id="tab-title-pending">Na čekanju (0)</span>
+                    </button>
+                    <button onclick="setAdminTab('approved')" id="tab-btn-approved" class="flex-1 py-3 px-4 border-b-2 border-transparent text-sphere-muted hover:text-sphere-dark flex items-center justify-center space-x-2">
+                        <i data-lucide="check" class="w-4 h-4 text-green-700"></i>
+                        <span id="tab-title-approved">Objavljeni (0)</span>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto flex-1 space-y-4">
+                    <!-- Tab Pending -->
+                    <div id="admin-content-pending" class="space-y-3">
+                        <p class="text-xs text-sphere-muted pb-2 border-b border-sphere-border">
+                            Svaki novi komentar gostiju se šalje na <strong>info@slovankacaffe.com</strong>. Klikom na „Odobri”, komentar se odmah prikazuje na sajtu.
+                        </p>
+                        <div id="admin-pending-list" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Tab Approved -->
+                    <div id="admin-content-approved" class="hidden space-y-3">
+                        <p class="text-xs text-sphere-muted pb-2 border-b border-sphere-border">
+                            Ovi komentari su trenutno javno objavljeni na sajtu.
+                        </p>
+                        <div id="admin-approved-list" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-sphere-surface border-t border-sphere-border text-[11px] text-sphere-muted flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="mail" class="w-4 h-4 text-sphere-gold shrink-0"></i>
+                        <span>Obaveštenja stižu na: <strong class="text-sphere-dark">info@slovankacaffe.com</strong></span>
+                    </div>
+                    <span class="text-[10px] text-stone-400">PIN: <code>1234</code></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIKA -->
     <script>
+        const RECIPIENT_EMAIL = 'info@slovankacaffe.com';
+        const ADMIN_PIN = '1234';
+        const STORAGE_APPROVED_KEY = 'slovanka_approved_comments';
+        const STORAGE_PENDING_KEY = 'slovanka_pending_comments';
+
+        const DEFAULT_REVIEWS = [
+            {
+                id: 'def-1',
+                fullName: 'Jovan M.',
+                contact: 'jovan@example.com',
+                rating: 5,
+                comment: 'Najbolja Slovan pica sa duplim testom u celoj Vojvodini! Uvek toplo i sveže pripremljeno.',
+                createdAt: 'Pre 2 dana',
+                status: 'approved'
+            },
+            {
+                id: 'def-2',
+                fullName: 'Sanja P.',
+                rating: 5,
+                comment: 'Predivna letnja terasa, izuzetno ljubazno osoblje i omiljena jutarnja espreso kafa.',
+                createdAt: 'Pre 5 dana',
+                status: 'approved'
+            },
+            {
+                id: 'def-3',
+                fullName: 'Milan K.',
+                rating: 5,
+                comment: 'Domaće kobasice sa senfom i pecivom su fantastične. Pravi domaći ukus Selenče.',
+                createdAt: 'Pre nedelju dana',
+                status: 'approved'
+            }
+        ];
+
+        function getApprovedComments() {
+            try {
+                const data = localStorage.getItem(STORAGE_APPROVED_KEY);
+                if (!data) {
+                    localStorage.setItem(STORAGE_APPROVED_KEY, JSON.stringify(DEFAULT_REVIEWS));
+                    return DEFAULT_REVIEWS;
+                }
+                return JSON.parse(data);
+            } catch (e) {
+                return DEFAULT_REVIEWS;
+            }
+        }
+
+        function getPendingComments() {
+            try {
+                const data = localStorage.getItem(STORAGE_PENDING_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveApprovedComments(list) {
+            localStorage.setItem(STORAGE_APPROVED_KEY, JSON.stringify(list));
+            renderReviews();
+        }
+
+        function savePendingComments(list) {
+            localStorage.setItem(STORAGE_PENDING_KEY, JSON.stringify(list));
+        }
+
+        function renderStars(rating) {
+            let stars = '';
+            for (let i = 0; i < rating; i++) {
+                stars += '★';
+            }
+            return `<span class="text-sphere-gold">${stars}</span>`;
+        }
+
+        function renderReviews() {
+            const list = getApprovedComments();
+            const container = document.getElementById('reviews-list-container');
+            const badge = document.getElementById('reviews-count-badge');
+            if (badge) badge.textContent = `(${list.length} komentara)`;
+
+            if (!container) return;
+            if (list.length === 0) {
+                container.innerHTML = '<p class="text-xs text-sphere-muted italic py-2">Trenutno nema objavljenih komentara.</p>';
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="bg-white/90 p-3.5 rounded-sm border border-stone-200/80 shadow-2xs">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="font-medium text-xs text-sphere-dark">${escapeHtml(item.fullName)}</span>
+                        ${renderStars(item.rating)}
+                    </div>
+                    <p class="text-xs text-sphere-muted italic">"${escapeHtml(item.comment)}"</p>
+                    ${item.createdAt ? `<span class="text-[10px] text-stone-400 block mt-1">${escapeHtml(item.createdAt)}</span>` : ''}
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[m]));
+        }
+
+        // Provera URL linka za odobrenje iz mejla
+        function checkUrlApproval() {
+            const params = new URLSearchParams(window.location.search);
+            const action = params.get('action') || params.get('odobri');
+            const id = params.get('id');
+
+            if (action === 'approve' || action === 'true' || params.has('odobri')) {
+                const autor = params.get('autor') || params.get('ime') || 'Gost';
+                const ocena = parseInt(params.get('ocena') || '5', 10);
+                const tekst = params.get('tekst') || params.get('komentar') || '';
+
+                const approved = getApprovedComments();
+                const pending = getPendingComments();
+
+                const existingIndex = approved.findIndex(c => c.id === id);
+                if (existingIndex === -1 && (tekst || id)) {
+                    // Pronađi iz pending ili napravi iz URL parametara
+                    const foundPending = pending.find(p => p.id === id);
+                    const newComment = {
+                        id: id || ('comm-' + Date.now()),
+                        fullName: foundPending ? foundPending.fullName : autor,
+                        contact: foundPending ? foundPending.contact : '',
+                        rating: foundPending ? foundPending.rating : ocena,
+                        comment: foundPending ? foundPending.comment : tekst,
+                        createdAt: 'Upravo odobreno',
+                        status: 'approved'
+                    };
+
+                    approved.unshift(newComment);
+                    saveApprovedComments(approved);
+
+                    // Ukloni iz pending
+                    if (id) {
+                        const newPending = pending.filter(p => p.id !== id);
+                        savePendingComments(newPending);
+                    }
+
+                    const banner = document.getElementById('url-approved-alert');
+                    const text = document.getElementById('url-approved-text');
+                    if (banner && text) {
+                        text.innerHTML = `Utisak gosta <strong>${escapeHtml(newComment.fullName)}</strong> (${newComment.rating}/5★) je sada javno vidljiv na sajtu.`;
+                        banner.classList.remove('hidden');
+                    }
+                }
+            }
+
+            if (params.has('admin') || params.has('moderacija')) {
+                openAdminModal();
+            }
+        }
+
+        // Slanje komentara
+        async function handleCommentSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('comment-submit-btn');
+            const name = document.getElementById('comment-name').value.trim();
+            const contact = document.getElementById('comment-contact').value.trim();
+            const rating = parseInt(document.getElementById('comment-rating').value, 10) || 5;
+            const comment = document.getElementById('comment-text').value.trim();
+
+            if (!name || !comment) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 text-sphere-gold animate-spin"></i><span>Šaljem na odobrenje...</span>';
+            lucide.createIcons();
+
+            const newId = 'comm-' + Date.now();
+            const newComment = {
+                id: newId,
+                fullName: name,
+                contact: contact,
+                rating: rating,
+                comment: comment,
+                createdAt: new Date().toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' }),
+                status: 'pending'
+            };
+
+            // Sačuvaj u pending
+            const pending = getPendingComments();
+            pending.unshift(newComment);
+            savePendingComments(pending);
+
+            // Generiši link za odobrenje
+            const baseUrl = window.location.origin + window.location.pathname;
+            const approveUrl = `${baseUrl}?action=approve&id=${newComment.id}&autor=${encodeURIComponent(newComment.fullName)}&ocena=${newComment.rating}&tekst=${encodeURIComponent(newComment.comment)}&token=slovanka2026#kontakt`;
+
+            // Priprema mailto linka
+            const mailtoSubject = encodeURIComponent(`Novi komentar za Slovanka Caffe: ${name} (${rating}★)`);
+            const mailtoBody = encodeURIComponent(`NOVI KOMENTAR ZA ODOBRENJE - SLOVANKA CAFFE PIZZERIA\n\nAutor: ${name}\nKontakt: ${contact || 'Nije navedeno'}\nOcena: ${rating}/5 zvezdica\nDatum: ${newComment.createdAt}\n\nTekst komentara:\n"${comment}"\n\n-------------------------\nKLIKNITE OVDE DA ODOBRITE OVAJ KOMENTAR I POSTAVITE GA NA SAJT:\n${approveUrl}\n\nIli otvorite Administraciju na sajtu sa PIN kodom: 1234`);
+            const mailtoHref = `mailto:${RECIPIENT_EMAIL}?subject=${mailtoSubject}&body=${mailtoBody}`;
+            document.getElementById('submitted-mailto-link').href = mailtoHref;
+
+            // Pošalji preko formsubmit.co API-ja
+            try {
+                await fetch(`https://formsubmit.co/ajax/${RECIPIENT_EMAIL}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        _subject: `Novi komentar za Slovanka Caffe: ${name} (${rating}★)`,
+                        'Ime i Prezime': name,
+                        'Kontakt': contact || 'Nije navedeno',
+                        'Ocena': `${rating} / 5 zvezdica`,
+                        'Komentar': comment,
+                        'Status': 'Čeka odobrenje',
+                        'LINK_ZA_ODOBRENJE': approveUrl,
+                        '_template': 'table'
+                    })
+                });
+            } catch (err) {
+                console.log('Formsubmit request error, mailto fallback available');
+            }
+
+            // Prikaz uspeha
+            document.getElementById('comment-main-form').classList.add('hidden');
+            document.getElementById('submitted-author-info').textContent = `Poštovani ${name}, vaš komentar je uspešno zabeležen sa ocenom ${rating}/5★.`;
+            document.getElementById('submitted-preview-text').textContent = `"${comment}"`;
+            document.getElementById('comment-submitted-box').classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="send" class="w-4 h-4 text-sphere-gold"></i><span>Pošaljite Komentar</span>';
+            lucide.createIcons();
+        }
+
+        function resetCommentForm() {
+            document.getElementById('comment-main-form').reset();
+            document.getElementById('comment-submitted-box').classList.add('hidden');
+            document.getElementById('comment-main-form').classList.remove('hidden');
+        }
+
+        // Moderacija komentara
+        let isAdminLoggedIn = false;
+        function openAdminModal() {
+            document.getElementById('admin-comments-modal').classList.remove('hidden');
+            if (isAdminLoggedIn) {
+                document.getElementById('admin-pin-view').classList.add('hidden');
+                document.getElementById('admin-panel-view').classList.remove('hidden');
+                document.getElementById('admin-panel-view').classList.add('flex');
+                refreshAdminLists();
+            } else {
+                document.getElementById('admin-pin-view').classList.remove('hidden');
+                document.getElementById('admin-panel-view').classList.add('hidden');
+                document.getElementById('admin-panel-view').classList.remove('flex');
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('admin-pin-err').classList.add('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-comments-modal').classList.add('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('admin-pin-input').value.trim();
+            if (pin === ADMIN_PIN) {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-pin-view').classList.add('hidden');
+                document.getElementById('admin-panel-view').classList.remove('hidden');
+                document.getElementById('admin-panel-view').classList.add('flex');
+                refreshAdminLists();
+            } else {
+                document.getElementById('admin-pin-err').classList.remove('hidden');
+            }
+        }
+
+        function setAdminTab(tab) {
+            const btnPending = document.getElementById('tab-btn-pending');
+            const btnApproved = document.getElementById('tab-btn-approved');
+            const contentPending = document.getElementById('admin-content-pending');
+            const contentApproved = document.getElementById('admin-content-approved');
+
+            if (tab === 'pending') {
+                btnPending.className = 'flex-1 py-3 px-4 border-b-2 border-sphere-gold bg-sphere-base text-sphere-dark flex items-center justify-center space-x-2';
+                btnApproved.className = 'flex-1 py-3 px-4 border-b-2 border-transparent text-sphere-muted hover:text-sphere-dark flex items-center justify-center space-x-2';
+                contentPending.classList.remove('hidden');
+                contentApproved.classList.add('hidden');
+            } else {
+                btnApproved.className = 'flex-1 py-3 px-4 border-b-2 border-sphere-gold bg-sphere-base text-sphere-dark flex items-center justify-center space-x-2';
+                btnPending.className = 'flex-1 py-3 px-4 border-b-2 border-transparent text-sphere-muted hover:text-sphere-dark flex items-center justify-center space-x-2';
+                contentApproved.classList.remove('hidden');
+                contentPending.classList.add('hidden');
+            }
+            refreshAdminLists();
+        }
+
+        function refreshAdminLists() {
+            const pending = getPendingComments();
+            const approved = getApprovedComments();
+
+            document.getElementById('tab-title-pending').textContent = `Na čekanju (${pending.length})`;
+            document.getElementById('tab-title-approved').textContent = `Objavljeni (${approved.length})`;
+
+            // Render pending
+            const pendingContainer = document.getElementById('admin-pending-list');
+            if (pending.length === 0) {
+                pendingContainer.innerHTML = '<div class="p-6 text-center bg-white border border-sphere-border text-xs text-stone-500">Trenutno nema komentara koji čekaju odobrenje.</div>';
+            } else {
+                pendingContainer.innerHTML = pending.map(item => `
+                    <div class="bg-white p-4 border border-sphere-gold rounded-sm shadow-xs space-y-2.5">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <span class="font-semibold text-sm text-sphere-dark">${escapeHtml(item.fullName)}</span>
+                                ${item.contact ? `<span class="ml-2 text-xs text-stone-500 bg-stone-100 px-2 py-0.5 rounded">${escapeHtml(item.contact)}</span>` : ''}
+                                <span class="text-[10px] text-stone-400 block mt-0.5">${item.createdAt || ''}</span>
+                            </div>
+                            ${renderStars(item.rating)}
+                        </div>
+                        <p class="text-xs text-stone-600 bg-sphere-base p-2.5 rounded border border-stone-200 italic">"${escapeHtml(item.comment)}"</p>
+                        <div class="flex items-center justify-end space-x-2 pt-1">
+                            <button onclick="adminRejectComment('${item.id}')" class="px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 border border-red-200 rounded">Odbij / Obriši</button>
+                            <button onclick="adminApproveComment('${item.id}')" class="px-3.5 py-1.5 text-xs font-semibold bg-green-700 text-white hover:bg-green-800 rounded">Odobri i objavi</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render approved
+            const approvedContainer = document.getElementById('admin-approved-list');
+            if (approved.length === 0) {
+                approvedContainer.innerHTML = '<div class="p-6 text-center bg-white border border-sphere-border text-xs text-stone-500">Nema objavljenih komentara.</div>';
+            } else {
+                approvedContainer.innerHTML = approved.map(item => `
+                    <div class="bg-white p-3.5 border border-sphere-border rounded-sm flex items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold text-xs text-sphere-dark">${escapeHtml(item.fullName)}</span>
+                                ${renderStars(item.rating)}
+                            </div>
+                            <p class="text-xs text-stone-600 italic mt-1">"${escapeHtml(item.comment)}"</p>
+                        </div>
+                        <button onclick="adminDeleteApproved('${item.id}')" class="text-stone-400 hover:text-red-600 p-2" title="Ukloni komentar sa sajta">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            lucide.createIcons();
+        }
+
+        function adminApproveComment(id) {
+            const pending = getPendingComments();
+            const approved = getApprovedComments();
+            const target = pending.find(p => p.id === id);
+            if (!target) return;
+
+            target.status = 'approved';
+            target.createdAt = 'Upravo odobreno';
+            approved.unshift(target);
+            saveApprovedComments(approved);
+
+            const newPending = pending.filter(p => p.id !== id);
+            savePendingComments(newPending);
+
+            refreshAdminLists();
+        }
+
+        function adminRejectComment(id) {
+            if (!confirm('Da li ste sigurni da želite da odbijete ovaj komentar?')) return;
+            const pending = getPendingComments();
+            const newPending = pending.filter(p => p.id !== id);
+            savePendingComments(newPending);
+            refreshAdminLists();
+        }
+
+        function adminDeleteApproved(id) {
+            if (!confirm('Da li ste sigurni da želite da uklonite ovaj komentar sa sajta?')) return;
+            const approved = getApprovedComments();
+            const newApproved = approved.filter(a => a.id !== id);
+            saveApprovedComments(newApproved);
+            refreshAdminLists();
+        }
+
+        // Inicijalizacija ikona i podataka
         lucide.createIcons();
         document.getElementById('year').textContent = new Date().getFullYear();
         const today = new Date().toISOString().split('T')[0];
         const dateInput = document.getElementById('res-date');
         if (dateInput) dateInput.value = today;
+
+        renderReviews();
+        checkUrlApproval();
 
         // Skrol efekat navigacije
         const nav = document.getElementById('main-nav');
@@ -1044,7 +1579,7 @@
         }
         document.getElementById('mobile-toggle').addEventListener('click', toggleMobileMenu);
 
-        // Stabilno filtriranje kategorija
+        // Filtriranje kategorija menija
         function setCategory(categoryName, btn) {
             const allButtons = document.querySelectorAll('.cat-btn');
             allButtons.forEach(b => {
@@ -1067,7 +1602,7 @@
             });
         }
 
-        // Modal
+        // Modal rezervacije
         function toggleModal(show) {
             const modal = document.getElementById('reservation-modal');
             if (show) {
@@ -1077,15 +1612,6 @@
             }
         }
 
-        function handleReservation(e) {
-            e.preventDefault();
-            const alertBox = document.getElementById('reservation-alert');
-            alertBox.classList.remove('hidden');
-            setTimeout(() => {
-                alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
-
         function handleModalSubmit(e) {
             e.preventDefault();
             const alertBox = document.getElementById('modal-reservation-alert');
@@ -1093,8 +1619,7 @@
             setTimeout(() => {
                 toggleModal(false);
                 alertBox.classList.add('hidden');
-                alert('Hvala! Vaš komentar je uspešno zabeležen.');
-            }, 1200);
+            }, 1500);
         }
 
         // Intersection Observer za animacije
