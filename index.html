@@ -252,8 +252,28 @@
                 JELOVNIK
             </h2>
             <div class="w-16 h-px bg-sphere-gold mx-auto mt-4"></div>
-            <p class="text-sphere-muted text-xs uppercase tracking-widest mt-4">Izaberite kategoriju za pregled jela</p>
+            <p class="text-sphere-muted text-xs uppercase tracking-widest mt-4">Izaberite kategoriju ili pretražite omiljeni obrok</p>
             
+            <!-- Pretraživač jela -->
+            <div class="mt-8 max-w-md mx-auto relative">
+                <input
+                    type="text"
+                    id="menu-search-input"
+                    oninput="filterMenuSearch()"
+                    placeholder="Pretražite jelo ili sastojak (npr. kulen, cezar, nutela)..."
+                    class="w-full pl-10 pr-12 py-2.5 bg-white border border-sphere-border text-xs placeholder:text-stone-400 focus:outline-none focus:border-sphere-dark rounded-sm transition-colors"
+                >
+                <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <button
+                    type="button"
+                    id="menu-search-clear"
+                    onclick="clearMenuSearch()"
+                    class="hidden text-[10px] text-stone-400 hover:text-stone-700 absolute right-3 top-1/2 -translate-y-1/2 uppercase tracking-wider font-medium"
+                >
+                    Obriši
+                </button>
+            </div>
+
             <!-- Filter Dugmad -->
             <div class="flex flex-wrap justify-center gap-2 md:gap-3 mt-8" id="category-tabs">
                 <button type="button" onclick="setCategory('pizze', this)" class="cat-btn px-5 py-2.5 text-xs uppercase tracking-widest font-medium border border-sphere-dark bg-sphere-dark text-white transition-all">
@@ -275,6 +295,27 @@
                     Doručak & Topla Jela
                 </button>
             </div>
+        </div>
+
+        <!-- Standardne dimenzije pica legenda (prikazuje se kad su izabrane pizze) -->
+        <div id="pizza-size-legend" class="mb-8 p-3.5 bg-stone-100/90 border border-sphere-border rounded-sm flex flex-wrap items-center justify-between text-xs text-sphere-muted">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-sphere-gold"></i>
+                <span class="font-medium text-sphere-dark">Standardne dimenzije pica:</span>
+                <span>Mala (28cm) • Velika (32cm) • Porodična (45cm)</span>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider text-sphere-gold font-semibold mt-1 sm:mt-0">
+                Cene u RSD (Mala | Velika | Porodična)
+            </span>
+        </div>
+
+        <!-- Obaveštenje kada nema rezultata pretrage -->
+        <div id="menu-no-results" class="hidden text-center py-16 bg-stone-100/50 border border-dashed border-sphere-border rounded-sm mb-8">
+            <p class="font-serif text-lg text-sphere-dark">Nema jela koja odgovaraju pretrazi</p>
+            <p class="text-xs text-sphere-muted mt-1">Pokušajte sa drugim nazivom jela ili sastojka.</p>
+            <button type="button" onclick="clearMenuSearch()" class="mt-4 px-4 py-2 text-xs uppercase tracking-wider bg-sphere-dark text-white rounded-sm font-medium hover:bg-stone-800 transition-colors">
+                Prikaži sva jela
+            </button>
         </div>
 
         <!-- Mreža jela -->
@@ -1579,8 +1620,11 @@
         }
         document.getElementById('mobile-toggle').addEventListener('click', toggleMobileMenu);
 
-        // Filtriranje kategorija menija
+        // Filtriranje i pretraga menija
+        let currentMenuCategory = 'pizze';
+
         function setCategory(categoryName, btn) {
+            currentMenuCategory = categoryName;
             const allButtons = document.querySelectorAll('.cat-btn');
             allButtons.forEach(b => {
                 b.classList.remove('bg-sphere-dark', 'text-white', 'border-sphere-dark');
@@ -1592,14 +1636,76 @@
                 btn.classList.remove('border-sphere-border', 'bg-transparent');
             }
 
+            applyMenuFilter();
+        }
+
+        function filterMenuSearch() {
+            const input = document.getElementById('menu-search-input');
+            const clearBtn = document.getElementById('menu-search-clear');
+            if (input && clearBtn) {
+                if (input.value.trim().length > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+            applyMenuFilter();
+        }
+
+        function clearMenuSearch() {
+            const input = document.getElementById('menu-search-input');
+            const clearBtn = document.getElementById('menu-search-clear');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            if (clearBtn) {
+                clearBtn.classList.add('hidden');
+            }
+            applyMenuFilter();
+        }
+
+        function applyMenuFilter() {
+            const searchInput = document.getElementById('menu-search-input');
+            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
             const cards = document.querySelectorAll('.menu-card');
+            const legend = document.getElementById('pizza-size-legend');
+            const noResults = document.getElementById('menu-no-results');
+
+            let visibleCount = 0;
+
             cards.forEach(card => {
-                if (card.getAttribute('data-cat') === categoryName) {
+                const cat = card.getAttribute('data-cat');
+                const text = card.textContent.toLowerCase();
+
+                const matchesCategory = (cat === currentMenuCategory);
+                const matchesSearch = !query || text.includes(query);
+
+                if (matchesCategory && matchesSearch) {
                     card.classList.remove('hidden');
+                    visibleCount++;
                 } else {
                     card.classList.add('hidden');
                 }
             });
+
+            // Legenda za dimenzije pica: prikazuje se kada je aktivna kategorija 'pizze' i kada ima jela
+            if (legend) {
+                if (currentMenuCategory === 'pizze' && visibleCount > 0) {
+                    legend.classList.remove('hidden');
+                } else {
+                    legend.classList.add('hidden');
+                }
+            }
+
+            // Prikaz poruke ako nijedno jelo ne odgovara pretrazi
+            if (noResults) {
+                if (visibleCount === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                }
+            }
         }
 
         // Modal rezervacije
